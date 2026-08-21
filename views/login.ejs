@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 50px; padding-bottom: 70px; max-width: 520px;">
+  <div class="glass-card">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <span style="font-size: 2.2rem;">🍸</span>
+      <h2 style="font-size: 1.6rem; font-weight: 800; margin-top: 8px;">Connoisseur Login</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Access your craft distillery allocation and order history.</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert alert-danger">
+        <div><%= error %></div>
+      </div>
+    <% } %>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="username">Username or Email</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="carlos" required autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+        Sign In
+      </button>
+    </form>
+
+    <!-- Pentesting Quick Test Credentials & SQLi Helpers -->
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px;">
+        🧪 Quick Credentials & SQLi Exploits:
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button type="button" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;" onclick="fillCreds('carlos', 'hunter2')">
+          👤 Fill Default User: <code>carlos / hunter2</code>
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;" onclick="fillCreds('wiener', 'peter')">
+          👤 Fill Test User: <code>wiener / peter</code>
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;" onclick="fillCreds('administrator\'--', 'anything')">
+          🔓 <strong>SQLi Admin Bypass:</strong> <code>administrator'--</code>
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;" onclick="fillCreds('carlos\' OR \'1\'=\'1', 'anything')">
+          🔓 <strong>SQLi Generic Bypass:</strong> <code>carlos' OR '1'='1</code>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function fillCreds(user, pass) {
+    document.getElementById('username').value = user;
+    document.getElementById('password').value = pass;
+  }
+</script>
+
+<%- include('partials/footer') %>

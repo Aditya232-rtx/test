@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 40px; padding-bottom: 70px;">
+  <!-- IDOR Profile Switcher Banner -->
+  <div class="glass-card" style="margin-bottom: 24px; border-left: 4px solid #38bdf8; padding: 16px 20px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <span style="color: #38bdf8; font-weight: 700; font-size: 0.95rem;">🔍 IDOR Vulnerability Active:</span>
+        <span style="font-size: 0.9rem; color: var(--text-muted); margin-left: 6px;">
+          Viewing User Profile for <strong>ID #<%= profileUser.id %> (<%= profileUser.username %>)</strong>.
+        </span>
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Inspect User ID:</span>
+        <a href="/profile?id=1" class="btn <%= profileUser.id == 1 ? 'btn-primary' : 'btn-outline' %> btn-sm">ID #1 (Carlos)</a>
+        <a href="/profile?id=2" class="btn <%= profileUser.id == 2 ? 'btn-primary' : 'btn-outline' %> btn-sm">ID #2 (Wiener)</a>
+        <a href="/profile?id=3" class="btn <%= profileUser.id == 3 ? 'btn-primary' : 'btn-outline' %> btn-sm" style="border-color: #ef4444; color: #f87171;">ID #3 (Admin Secret API Key!)</a>
+      </div>
+    </div>
+  </div>
+
+  <% if (message) { %>
+    <div class="alert alert-success">
+      <%= message %>
+    </div>
+  <% } %>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <!-- Profile Information Card -->
+    <div class="glass-card">
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #eab308, #ca8a04); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #0f172a; font-weight: 800;">
+          <%= profileUser.username.charAt(0).toUpperCase() %>
+        </div>
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;"><%= profileUser.username %></h2>
+          <span class="badge <%= profileUser.role === 'admin' ? 'badge-critical' : 'badge-low' %>">
+            <%= profileUser.role.toUpperCase() %>
+          </span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem;">
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase;">User ID:</span>
+          <span style="font-weight: 600;">#<%= profileUser.id %></span>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase;">Email:</span>
+          <span><%= profileUser.email %></span>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase;">Shipping Address:</span>
+          <span><%= profileUser.address || 'No address on file' %></span>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase;">Store Account Credit:</span>
+          <span style="color: var(--accent); font-weight: 700; font-size: 1.1rem;">$<%= typeof profileUser.balance === 'number' ? profileUser.balance.toFixed(2) : profileUser.balance %></span>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; text-transform: uppercase;">Private API Key (Sensitive):</span>
+          <div class="code-box" style="margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+            <code id="api-key-text"><%= profileUser.api_key %></code>
+            <button type="button" class="btn btn-outline btn-sm copy-btn" data-target="api-key-text" style="padding: 2px 8px; font-size: 0.75rem;">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Settings & CSRF Vulnerable Change Email Card -->
+    <div class="glass-card">
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">Account Settings</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+        Update your registered email and communication preferences.
+      </p>
+
+      <!-- VULNERABILITY: CSRF - Missing Anti-CSRF Token -->
+      <form action="/profile/change-email" method="POST">
+        <input type="hidden" name="userId" value="<%= profileUser.id %>">
+        
+        <div class="form-group">
+          <label class="form-label" for="email">New Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" value="<%= profileUser.email %>" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Update Email Address
+        </button>
+      </form>
+
+      <!-- CSRF Exploit PoC Box for Pentesting -->
+      <div style="margin-top: 24px; background: rgba(239, 68, 68, 0.05); border: 1px dashed rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 6px;">
+          ⚡ CSRF Vulnerability (CWE-352):
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+          This form lacks anti-CSRF synchronization tokens and cookie SameSite protection. An attacker can host an auto-submitting HTML form to silently change user emails.
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

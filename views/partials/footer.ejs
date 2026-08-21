@@ -1,0 +1,53 @@
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand Info -->
+        <div class="footer-col">
+          <h4 style="display: flex; align-items: center; gap: 8px;">
+            <span>🍸</span> Gin & Juice Shop
+          </h4>
+          <p>
+            Artisanal spirits, cold-pressed citrus botanicals, and bespoke mixology provisions. Handcrafted for cocktail connoisseurs and security researchers.
+          </p>
+          <p style="margin-top: 10px; font-size: 0.75rem; color: #64748b;">
+            ⚠️ <em>Deliberately vulnerable educational lab environment.</em>
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+            <li><a href="/" style="color: var(--text-muted); font-size: 0.85rem;">All Spirits & Provisions</a></li>
+            <li><a href="/vulnerabilities" style="color: #f59e0b; font-size: 0.85rem;">Vulnerability Scoreboard</a></li>
+            <li><a href="/clickjack-test" style="color: var(--text-muted); font-size: 0.85rem;">Clickjacking PoC Frame</a></li>
+            <li><a href="/robots.txt" style="color: var(--text-muted); font-size: 0.85rem;">robots.txt</a></li>
+            <li><a href="/api/debug/system-info" style="color: var(--text-muted); font-size: 0.85rem;">System Debug API</a></li>
+          </ul>
+        </div>
+
+        <!-- Newsletter (Vulnerable to Reflected XSS) -->
+        <div class="footer-col">
+          <h4>Join the Distillers Circle</h4>
+          <p>Get exclusive early access to small-batch seasonal releases and cocktail recipes.</p>
+          
+          <form action="/subscribe" method="GET" class="newsletter-form">
+            <input type="text" name="email" placeholder="Enter your email..." required>
+            <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+          </form>
+          <p style="font-size: 0.75rem; color: #64748b; margin-top: 6px;">
+            💡 <em>Hint: Test Reflected XSS via <code>/subscribe?email=&lt;script&gt;alert(1)&lt;/script&gt;</code></em>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Gin & Juice Shop Ltd. Crafted for DAST Evaluation & Web Security Practice.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

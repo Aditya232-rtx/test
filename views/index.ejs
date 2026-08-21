@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 30px; padding-bottom: 50px;">
+  <!-- Hero Section -->
+  <section class="hero-banner">
+    <h1>Artisanal Spirits & Small-Batch Juices</h1>
+    <p>Distilled with botanical precision, blended for legendary West Coast craft cocktails.</p>
+  </section>
+
+  <!-- Category Pills Filter (Vulnerable to SQL Injection) -->
+  <div class="category-filter">
+    <a href="/" class="pill <%= !selectedCategory && !searchQuery ? 'active' : '' %>">All Collections</a>
+    <% categories.forEach(cat => { %>
+      <a href="/?category=<%= encodeURIComponent(cat) %>" class="pill <%= selectedCategory === cat ? 'active' : '' %>"><%= cat %></a>
+    <% }) %>
+  </div>
+
+  <!-- Database / SQL Debug Box (Educational & Error-Based SQLi Feedback) -->
+  <% if (dbError) { %>
+    <div class="alert alert-danger" style="display: block;">
+      <strong>⚠️ Database Query Error (SQL Injection Diagnostic):</strong>
+      <div class="code-box" style="margin-top: 8px; color: #f87171;"><%= dbError %></div>
+      <div style="font-size: 0.8rem; margin-top: 6px; color: #94a3b8;">
+        Executed Query: <code><%= executedSql %></code>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Search / Filter State Indicator -->
+  <% if (searchQuery) { %>
+    <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+      <h3>Search Results for: "<span style="color: var(--primary);"><%= searchQuery %></span>"</h3>
+      <a href="/" class="btn btn-outline btn-sm">Clear Search</a>
+    </div>
+  <% } else if (selectedCategory) { %>
+    <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+      <h3>Category: "<span style="color: var(--primary);"><%= selectedCategory %></span>"</h3>
+      <a href="/" class="btn btn-outline btn-sm">View All</a>
+    </div>
+  <% } %>
+
+  <!-- Products Grid -->
+  <% if (products.length === 0 && !dbError) { %>
+    <div class="glass-card" style="text-align: center; padding: 50px 20px; margin: 30px 0;">
+      <h3 style="color: #94a3b8;">No products found.</h3>
+      <p style="margin-top: 10px; color: #64748b;">Try adjusting your search criteria or category filter.</p>
+    </div>
+  <% } else { %>
+    <div class="product-grid">
+      <% products.forEach(product => { %>
+        <div class="glass-card product-card">
+          <div class="product-image-wrap">
+            <img src="<%= product.image_url || 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600' %>" alt="<%= product.name %>">
+            <span class="product-badge"><%= product.category || 'Special' %></span>
+            <% if (product.released === 0) { %>
+              <span class="product-badge" style="background: #ef4444; color: #fff; left: auto; right: 10px;">UNRELEASED</span>
+            <% } %>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-title"><%= product.name %></h3>
+            <p class="product-desc"><%= product.description %></p>
+
+            <div class="product-bottom">
+              <div>
+                <span class="product-price">$<%= typeof product.price === 'number' ? product.price.toFixed(2) : product.price %></span>
+                <% if (product.rating) { %>
+                  <div style="font-size: 0.8rem; color: #eab308;">★ <%= product.rating %> / 5.0</div>
+                <% } %>
+              </div>
+
+              <div style="display: flex; gap: 6px;">
+                <a href="/product?id=<%= product.id %>" class="btn btn-outline btn-sm">Details</a>
+                
+                <form action="/cart/add" method="POST" style="display: inline;">
+                  <input type="hidden" name="productId" value="<%= product.id %>">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Quick Pentest Helper Banner -->
+  <section class="glass-card" style="margin-top: 30px; border-left: 4px solid var(--primary);">
+    <h3 style="font-size: 1.1rem; color: var(--primary); margin-bottom: 8px;">🎯 Pentesting Quick Hints</h3>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+      Looking to test SQL injection? Try injecting payloads into the category filter or search input:
+    </p>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <a href="/?category=Gin'+OR+1=1--" class="btn btn-outline btn-sm">
+        🔓 Unreleased Products SQLi (<code>' OR 1=1--</code>)
+      </a>
+      <a href="/?category=Gin'+UNION+SELECT+id,username,password,email,role,api_key,balance,1+FROM+users--" class="btn btn-outline btn-sm">
+        📜 Union SQLi Dump Users (<code>' UNION SELECT...</code>)
+      </a>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

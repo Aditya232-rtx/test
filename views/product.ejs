@@ -1,0 +1,113 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 40px; padding-bottom: 60px;">
+  <div style="margin-bottom: 20px;">
+    <a href="/" class="btn btn-outline btn-sm">← Back to Catalog</a>
+  </div>
+
+  <div class="glass-card" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; align-items: start;">
+    <!-- Product Image -->
+    <div style="border-radius: 12px; overflow: hidden; background: #1e293b;">
+      <img src="<%= product.image_url %>" alt="<%= product.name %>" style="width: 100%; height: auto; display: block; object-fit: cover;">
+    </div>
+
+    <!-- Product Details -->
+    <div>
+      <span class="badge badge-medium" style="margin-bottom: 12px;"><%= product.category %></span>
+      <% if (product.released === 0) { %>
+        <span class="badge badge-critical" style="margin-left: 8px;">SECRET UNRELEASED ITEM</span>
+      <% } %>
+
+      <h1 style="font-size: 2rem; font-weight: 800; margin: 8px 0 14px 0;"><%= product.name %></h1>
+      
+      <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 18px;">
+        $<%= typeof product.price === 'number' ? product.price.toFixed(2) : product.price %>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 24px;">
+        <%= product.description %>
+      </p>
+
+      <!-- Add to Cart Form -->
+      <form action="/cart/add" method="POST" style="display: flex; gap: 12px; align-items: center; margin-bottom: 30px;">
+        <input type="hidden" name="productId" value="<%= product.id %>">
+        <label for="quantity" style="font-size: 0.9rem; color: var(--text-muted);">Qty:</label>
+        <input type="number" id="quantity" name="quantity" value="1" min="1" max="50" class="form-control" style="width: 80px; text-align: center;">
+        <button type="submit" class="btn btn-primary" style="flex-grow: 1;">🛒 Add to Cart</button>
+      </form>
+
+      <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+      <!-- ============================================================== -->
+      <!-- VULNERABILITY: DOM-BASED CROSS-SITE SCRIPTING (DOM XSS) -->
+      <!-- Interactive Custom Bottle Engraving & Message Preview -->
+      <!-- ============================================================== -->
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border-color); border-radius: 8px; padding: 18px;">
+        <h4 style="color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span>🎁</span> Complimentary Bottle Engraving & Custom Message
+        </h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+          Preview your custom gift note live on the bottle:
+        </p>
+
+        <!-- Input for message -->
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <input type="text" id="engraving-input" class="form-control" placeholder="e.g., Happy 30th Birthday, Carlos!" value="">
+          <button type="button" id="preview-btn" class="btn btn-accent btn-sm">Preview</button>
+        </div>
+
+        <!-- Live Unsafe DOM Render Target -->
+        <div style="background: #020617; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Live Bottle Preview:</div>
+          <div id="engraving-preview-target" style="font-style: italic; color: #38bdf8; min-height: 24px;">
+            (No custom message applied)
+          </div>
+        </div>
+
+        <!-- Exploit Hint Box for Scanners & Pentesting -->
+        <div style="margin-top: 14px; font-size: 0.8rem; color: #94a3b8; background: rgba(234, 179, 8, 0.05); padding: 8px 12px; border-radius: 6px;">
+          💡 <strong>DOM XSS Source:</strong> <code>window.location.search (?custom_msg=...)</code> or <code>window.location.hash</code><br>
+          ⚡ <strong>DOM XSS Sink:</strong> <code>document.getElementById(...).innerHTML = ...</code><br>
+          🧪 <a href="/product?id=<%= product.id %>&custom_msg=<img src=x onerror=alert('DOM-XSS-Triggered!')>" style="color: var(--primary);">Click here to test DOM XSS Payload</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Client-side DOM XSS Vulnerable Script -->
+<script>
+  // DOM XSS Sink Implementation:
+  // Reads URL parameter or hash and directly writes to innerHTML without sanitization
+  function updateEngravingPreview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const customMsgParam = urlParams.get('custom_msg');
+    const hashVal = decodeURIComponent(window.location.hash.substring(1));
+    
+    const targetElement = document.getElementById('engraving-preview-target');
+    const inputElement = document.getElementById('engraving-input');
+
+    if (customMsgParam) {
+      // VULNERABLE SINK: innerHTML used with unescaped URL parameter
+      targetElement.innerHTML = '✨ "' + customMsgParam + '"';
+      if (inputElement) inputElement.value = customMsgParam;
+    } else if (hashVal) {
+      // VULNERABLE SINK: innerHTML used with unescaped URL hash
+      targetElement.innerHTML = '✨ "' + hashVal + '"';
+      if (inputElement) inputElement.value = hashVal;
+    }
+  }
+
+  document.getElementById('preview-btn')?.addEventListener('click', () => {
+    const text = document.getElementById('engraving-input').value;
+    const targetElement = document.getElementById('engraving-preview-target');
+    // VULNERABLE SINK: Direct innerHTML assignment from user input
+    targetElement.innerHTML = '✨ "' + text + '"';
+  });
+
+  // Run on page load
+  window.addEventListener('DOMContentLoaded', updateEngravingPreview);
+  window.addEventListener('hashchange', updateEngravingPreview);
+</script>
+
+<%- include('partials/footer') %>

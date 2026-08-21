@@ -1,0 +1,30 @@
+{
+  "name": "gin-and-juice-shop",
+  "version": "1.0.0",
+  "description": "Deliberately vulnerable e-commerce web application inspired by PortSwigger's Gin & Juice Shop for scanner testing and pentesting practice.",
+  "main": "server.js",
+  "scripts": {
+    "init-db": "node init_db.js",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "vulnerable-app",
+    "dast-testing",
+    "pentesting",
+    "security",
+    "owasp",
+    "portswigger",
+    "sqli",
+    "xss",
+    "idor"
+  ],
+  "author": "Security Engineering Testbed",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  }
+}

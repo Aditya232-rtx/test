@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 40px; padding-bottom: 70px;">
+  <!-- Admin Secret Flag Banner -->
+  <div class="glass-card" style="margin-bottom: 24px; border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.08);">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h2 style="color: #f87171; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <span>👑</span> Master Administrative Console Unlocked!
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+          Privilege escalation successful via SQL Injection login bypass or base64 cookie session forgery.
+        </p>
+      </div>
+      <div class="code-box" style="color: #eab308; font-weight: 700; font-size: 0.95rem;">
+        <%= secretFlag %>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card" style="margin-bottom: 30px;">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+      <span>👥</span> Registered Customer Accounts & Database Records
+    </h3>
+    
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Balance</th>
+            <th>API Token</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr>
+              <td>#<%= u.id %></td>
+              <td style="font-weight: 600;"><%= u.username %></td>
+              <td><%= u.email %></td>
+              <td>
+                <span class="badge <%= u.role === 'admin' ? 'badge-critical' : 'badge-low' %>">
+                  <%= u.role %>
+                </span>
+              </td>
+              <td style="color: var(--accent); font-weight: 700;">$<%= typeof u.balance === 'number' ? u.balance.toFixed(2) : u.balance %></td>
+              <td><code><%= u.api_key %></code></td>
+              <td>
+                <% if (u.role !== 'admin') { %>
+                  <form action="/admin/delete-user" method="POST" style="margin: 0;">
+                    <input type="hidden" name="id" value="<%= u.id %>">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete user <%= u.username %>?')">
+                      Delete
+                    </button>
+                  </form>
+                <% } else { %>
+                  <span style="color: #64748b; font-size: 0.8rem;">Protected</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+      <span>📬</span> Recent Newsletter Subscriptions
+    </h3>
+
+    <% if (subscribers.length === 0) { %>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">No subscribers yet.</p>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Subscriber Email</th>
+              <th>Subscribed At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% subscribers.forEach(sub => { %>
+              <tr>
+                <td>#<%= sub.id %></td>
+                <td><code><%= sub.email %></code></td>
+                <td style="color: var(--text-muted);"><%= sub.created_at %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

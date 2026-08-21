@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 50px; padding-bottom: 70px; max-width: 680px;">
+  <div class="glass-card" style="text-align: center; padding: 40px 30px;">
+    <div style="font-size: 3rem; margin-bottom: 12px;">📬</div>
+    
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px;">Newsletter Subscription</h1>
+    
+    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 20px;">
+      <%= message %>
+    </p>
+
+    <!-- ============================================================== -->
+    <!-- VULNERABILITY: REFLECTED CROSS-SITE SCRIPTING (XSS) -->
+    <!-- Notice the unescaped EJS tag: <%- email %> (instead of <%= email %>) -->
+    <!-- ============================================================== -->
+    <% if (email) { %>
+      <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin: 20px 0; font-size: 1.1rem; color: var(--primary);">
+        <%- email %>
+      </div>
+    <% } %>
+
+    <div style="margin-top: 30px; display: flex; justify-content: center; gap: 12px;">
+      <a href="/" class="btn btn-primary">Return to Catalog</a>
+      <a href="/vulnerabilities" class="btn btn-outline">View Vulnerability Scoreboard</a>
+    </div>
+
+    <!-- Reflected XSS Exploit Hint Box -->
+    <div style="margin-top: 35px; text-align: left; background: rgba(234, 179, 8, 0.05); border: 1px dashed var(--primary); border-radius: 8px; padding: 14px;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">
+        💡 Reflected XSS Test Payloads:
+      </div>
+      <ul style="font-size: 0.8rem; color: var(--text-muted); padding-left: 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+        <li><code>/subscribe?email=&lt;script&gt;alert('Reflected-XSS')&lt;/script&gt;</code></li>
+        <li><code>/subscribe?email=&lt;img src=x onerror=alert(document.cookie)&gt;</code></li>
+        <li><code>/subscribe?email=&lt;svg/onload=alert('XSS-Pwned')&gt;</code></li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

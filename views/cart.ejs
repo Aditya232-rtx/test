@@ -1,0 +1,114 @@
+<%- include('partials/header') %>
+
+<main class="container" style="padding-top: 40px; padding-bottom: 70px;">
+  <!-- IDOR Cart Switcher Banner -->
+  <div class="glass-card" style="margin-bottom: 24px; border-left: 4px solid #38bdf8; padding: 16px 20px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <span style="color: #38bdf8; font-weight: 700; font-size: 0.95rem;">🔍 IDOR Vulnerability Active:</span>
+        <span style="font-size: 0.9rem; color: var(--text-muted); margin-left: 6px;">
+          Currently viewing <strong>Cart ID #<%= cartId %></strong>. (Try switching to Cart #3 to inspect Admin's classified cart!)
+        </span>
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Quick Switch:</span>
+        <a href="/cart?cartId=1" class="btn <%= cartId == 1 ? 'btn-primary' : 'btn-outline' %> btn-sm">Cart #1 (Carlos)</a>
+        <a href="/cart?cartId=2" class="btn <%= cartId == 2 ? 'btn-primary' : 'btn-outline' %> btn-sm">Cart #2 (Wiener)</a>
+        <a href="/cart?cartId=3" class="btn <%= cartId == 3 ? 'btn-primary' : 'btn-outline' %> btn-sm" style="border-color: #ef4444;">Cart #3 (Admin Secret)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+      <h1 style="font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+        <span>🛒</span> Your Tasting Cart <span style="font-size: 1rem; color: var(--text-muted); font-weight: normal;">(ID: <%= cartId %>)</span>
+      </h1>
+      <a href="/" class="btn btn-outline btn-sm">Continue Shopping</a>
+    </div>
+
+    <% if (orderSuccess) { %>
+      <div class="alert alert-success" style="margin-bottom: 24px;">
+        🎉 <strong>Order Placed Successfully!</strong> Your artisanal gin and juice provisions are being prepared for dispatch.
+      </div>
+    <% } %>
+
+    <% if (items.length === 0) { %>
+      <div style="text-align: center; padding: 50px 20px;">
+        <span style="font-size: 3rem; opacity: 0.5;">🛒</span>
+        <h3 style="color: #94a3b8; margin-top: 10px;">Cart #<%= cartId %> is currently empty</h3>
+        <p style="color: #64748b; margin-bottom: 20px;">Explore our catalog to add craft spirits and botanical juices.</p>
+        <a href="/" class="btn btn-primary">Browse Spirits</a>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.forEach(item => { %>
+              <tr>
+                <td style="display: flex; align-items: center; gap: 14px;">
+                  <img src="<%= item.image_url %>" alt="<%= item.name %>" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">
+                  <div>
+                    <strong><%= item.name %></strong>
+                    <div style="font-size: 0.75rem; color: #64748b;">Product ID: #<%= item.product_id %></div>
+                  </div>
+                </td>
+                <td>$<%= item.price.toFixed(2) %></td>
+                <td>
+                  <span style="font-weight: 600;"><%= item.quantity %></span>
+                </td>
+                <td style="font-weight: 700; color: var(--primary);">$<%= item.subtotal.toFixed(2) %></td>
+                <td>
+                  <form action="/cart/remove" method="POST" style="margin: 0;">
+                    <input type="hidden" name="itemId" value="<%= item.item_id %>">
+                    <input type="hidden" name="cartId" value="<%= cartId %>">
+                    <button type="submit" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                      ✕ Remove
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+        <div style="min-width: 300px; background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; color: var(--text-muted);">
+            <span>Subtotal:</span>
+            <span>$<%= total %></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem; color: var(--text-muted);">
+            <span>Shipping:</span>
+            <span style="color: var(--accent);">COMPLIMENTARY</span>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 12px 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.25rem; font-weight: 800;">
+            <span>Total:</span>
+            <span style="color: var(--primary);">$<%= total %></span>
+          </div>
+
+          <form action="/cart/checkout" method="POST">
+            <input type="hidden" name="cartId" value="<%= cartId %>">
+            <button type="submit" class="btn btn-accent" style="width: 100%; padding: 12px; font-size: 1rem;">
+              💳 Complete Checkout
+            </button>
+          </form>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

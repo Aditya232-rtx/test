@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gin & Juice Shop - Craft Spirits & Mixology</title>
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container">
+      <a href="/" class="brand-logo">
+        <span style="font-size: 1.6rem;">🍸</span>
+        <div>
+          Gin & Juice <span style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 1.1rem; color: var(--primary);">Shop</span>
+        </div>
+      </a>
+
+      <!-- Search Bar (Vulnerable to SQLi) -->
+      <form action="/search" method="GET" class="nav-search">
+        <input type="text" name="q" placeholder="Search craft spirits..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <button type="submit" title="Search">🔍</button>
+      </form>
+
+      <!-- Navigation Links -->
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Catalog</a></li>
+        <li>
+          <a href="/vulnerabilities" class="nav-link" style="color: #f59e0b; font-weight: 700;">
+            🎯 Vulnerabilities
+          </a>
+        </li>
+        <li>
+          <a href="/cart" class="nav-link">
+            🛒 Cart
+          </a>
+        </li>
+        <% if (user) { %>
+          <li>
+            <a href="/profile" class="nav-link" style="color: var(--accent);">
+              👤 <%= user.username %> (<%= user.role %>)
+            </a>
+          </li>
+          <% if (user.role === 'admin' || user.isAdmin) { %>
+            <li><a href="/admin" class="nav-link" style="color: #ef4444; font-weight: 700;">👑 Admin</a></li>
+          <% } %>
+          <li><a href="/logout" class="btn btn-outline btn-sm">Log Out</a></li>
+        <% } else { %>
+          <li><a href="/login" class="btn btn-primary btn-sm">Log In</a></li>
+        <% } %>
+      </ul>
+    </div>
+  </header>
