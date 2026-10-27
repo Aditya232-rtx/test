@@ -89,7 +89,7 @@
 
     if (customMsgParam) {
       // VULNERABLE SINK: innerHTML used with unescaped URL parameter
-      targetElement.innerHTML = '✨ "' + customMsgParam + '"';
+      targetElement.textContent = `✨ "${customMsgParam}"`;
       if (inputElement) inputElement.value = customMsgParam;
     } else if (hashVal) {
       // VULNERABLE SINK: innerHTML used with unescaped URL hash
